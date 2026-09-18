@@ -1,0 +1,48 @@
+name: Sync CMI data
+
+on:
+  schedule:
+    # 01:00 UTC = 08:00 ไทย ของวันที่ 1 และ 16 ของทุกเดือน
+    - cron: "0 1 1,16 * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cmi-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests lxml
+
+      - name: Check that cmi.moph.go.th is reachable
+        run: |
+          curl -sS -m 30 -o /dev/null -w "HTTP %{http_code} in %{time_total}s\n" \
+            "https://cmi.moph.go.th/report/spcl/index?menu_id=18"
+
+      - name: Scrape CMI
+        run: python scrape_cmi.py --region 1
+
+      - name: Commit data.json
+        run: |
+          git config user.name "cmi-sync"
+          git config user.email "actions@github.com"
+          if git diff --quiet -- data.json; then
+            echo "no change"
+          else
+            git add data.json
+            git commit -m "sync: CMI data $(date -u +%Y-%m-%d)"
+            git push
+          fi
