@@ -268,6 +268,27 @@ details.def{border-radius:16px;box-shadow:var(--shadow);padding:14px 20px}
 footer{text-align:left;border-top:1px solid var(--line);padding-top:16px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 @media (max-width:640px){.brand h1{font-size:18px}.tile .v{font-size:22px}}
+footer.credit{margin:28px 0 8px;padding:0;border:1px solid var(--line);border-top:1px solid var(--line);border-radius:16px;background:var(--panel);overflow:hidden;box-shadow:var(--shadow);color:var(--ink);font-size:14px}
+.credit__rule{height:3px;background:linear-gradient(90deg,var(--accent) 0%,var(--accent-2) 100%)}
+.credit__grid{display:grid;grid-template-columns:1fr 1fr;padding:22px 24px}
+.credit__col{padding-right:24px}
+.credit__col+.credit__col{border-left:1px solid var(--line2);padding-left:24px}
+.credit__role{font-size:11px;letter-spacing:.08em;color:var(--muted);font-weight:600;margin:0 0 6px}
+.credit__name{font-family:var(--display);font-size:17px;font-weight:600;color:var(--ink);margin:0 0 2px;line-height:1.35}
+.credit__pos,.credit__org{font-size:13px;color:var(--ink2);line-height:1.55;margin:0}
+.credit__org{margin-top:2px}
+.credit__org a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-soft)}
+.credit__org a:hover{border-bottom-color:var(--accent)}
+.credit__contact{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.credit__chip{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--ink2);text-decoration:none;background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+.credit__chip:hover{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.credit__chip svg{width:14px;height:14px;flex:none;opacity:.7}
+.credit__foot{border-top:1px solid var(--line2);background:var(--panel2);padding:12px 24px;font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center}
+.credit__foot a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--line)}
+.credit__foot a:hover{color:var(--accent)}
+@media (max-width:720px){.credit__grid{grid-template-columns:1fr;gap:18px;padding:18px}.credit__col{padding-right:0}
+  .credit__col+.credit__col{border-left:0;border-top:1px solid var(--line2);padding-left:0;padding-top:18px}.credit__foot{padding:12px 18px}}
+@media print{footer.credit{break-inside:avoid}}
 </style>
 
 
@@ -307,11 +328,37 @@ footer{text-align:left;border-top:1px solid var(--line);padding-top:16px}
       <dt>สีต่ำ / สีสูง</dt><dd>CMI ของ รพ. &lt; MEAN−SD หรือ &gt; MEAN+SD</dd>
       <dt>CMI &lt; 0.5 แต่ค่ากลาง &gt; 0.5</dt><dd>CMI ของ รพ. ต่ำกว่า 0.5 ขณะที่ทั้ง MEAN และ MEDIAN ของกลุ่มสูงกว่า 0.5 (เงื่อนไขทบทวนการสรุปเวชระเบียน)</dd>
       <dt>Adj AN ต่อ 10,000 ปชก.UC</dt><dd>จำนวนผู้ป่วยโรคนั้น ÷ ปชก.UC (1 เม.ย. 68) × 10,000 · MEAN/SD คิดจากทุก รพ. ในกลุ่ม รวมค่า 0 · สีเข้ม &gt; MEAN+2SD</dd>
-      <dt>ผู้ป่วยโรค CMI &lt; 0.5 ต่อ 10,000 ปชก.UC</dt><dd>คิดราย รพ.: รวมผู้ป่วยในทุกรหัส PDx ที่ CMI ของ รพ. นั้นเอง (Sum AdjRW ÷ ราย) ต่ำกว่า 0.5 แล้วหารด้วย ปชก.UC ของ รพ. × 10,000 · ไม่ใช้ค่าเฉลี่ยกลุ่ม</dd>
+      <dt>ผู้ป่วยใน AdjRW &lt; 0.5 ต่อ 10,000 ปชก.UC</dt><dd>จำนวนผู้ป่วยในที่ AdjRW ของราย (admission) นั้นต่ำกว่า 0.5 หารด้วย ปชก.UC ของ รพ. × 10,000 · จำนวนรายดึงตรงจากเว็บ CMI รายงาน “ร้อยละของผู้ป่วยในจำแนกตามระดับ CMI” คอลัมน์ AdjRW &lt; 0.5 ตัวเลขจึงตรงกับเว็บต้นทางทุกแห่ง (เดิมคิดจากการรวมรหัส PDx ที่ CMI ของ รพ. ต่ำกว่า 0.5 ซึ่งเป็นคนละฐาน)</dd>
       <dt>TOP100</dt><dd>100 รหัสโรคที่มีผู้ป่วยรวมสูงสุดในกลุ่มที่เลือก</dd>
     </dl>
   </details>
   <footer id="foot"></footer>
+
+  <footer class="credit">
+    <div class="credit__rule"></div>
+    <div class="credit__grid">
+      <div class="credit__col">
+        <p class="credit__role">ผู้ออกแบบข้อมูลและตัวชี้วัด</p>
+        <p class="credit__name">นายแพทย์กุลพล ตั้งรัตนาพิบูล</p>
+        <p class="credit__pos">นายแพทย์ชำนาญการ (ด้านเวชกรรม)</p>
+        <p class="credit__org">ปฏิบัติหน้าที่ผู้อำนวยการ <a href="https://www.songkwaehospital.com/" target="_blank" rel="noopener">โรงพยาบาลสองแคว</a> อำเภอสองแคว จังหวัดน่าน</p>
+      </div>
+      <div class="credit__col">
+        <p class="credit__role">ผู้พัฒนาระบบ / ติดต่อการใช้งาน</p>
+        <p class="credit__name">นางสาวตรีรัตน์ ทนันชัย</p>
+        <p class="credit__pos">นักวิชาการคอมพิวเตอร์ปฏิบัติการ</p>
+        <div class="credit__contact">
+          <a class="credit__chip" href="tel:+6654718817,,103"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>054-718817 ต่อ 103</a>
+          <a class="credit__chip" href="mailto:treerat1989@gmail.com"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>treerat1989@gmail.com</a>
+        </div>
+      </div>
+    </div>
+    <div class="credit__foot">
+      <span>แหล่งข้อมูล: cmi.moph.go.th · ปชก.UC และเตียง จาก M&amp;E เขตสุขภาพที่ 1</span>
+      <span>ปรับปรุงข้อมูลล่าสุด <b id="creditUpdated">—</b></span>
+      <span><a href="https://github.com/cmi-rh1/cmi-rh1" target="_blank" rel="noopener">ซอร์สโค้ดและวิธีคำนวณ</a></span>
+    </div>
+  </footer>
 </main>
 
 <div id="boot" style="padding:48px 16px;text-align:center;color:#8089a0;font:14px system-ui">กำลังโหลดข้อมูล…</div>
@@ -374,15 +421,15 @@ function groupStats(g){
   });
   // per-hospital flag counts
   const top100 = new Set(list.slice(0,100).map(t=>t.c));
-  const flags = mem.map(x=>{ const f={x,lo:[],hi:[],cond:[],vhi:[],vhi2:[],lowCmiVol:0,lowCmiAN:0};
+  const flags = mem.map(x=>{ const lw=(D.LOW&&D.LOW[x.i])||null;
+    const f={x,lo:[],hi:[],cond:[],vhi:[],vhi2:[],lowCmiVol:null,lowCmiAN:lw?lw[0]:null,lowPct:lw?lw[1]:null};
     list.forEach(t=>{ const r=PDXBY[x.i].get(t.c); const an=r?r[2]:0; const v=x.pop?an/x.pop*10000:0;
-      if(an>0 && r[3]/an<0.5) { f.lowCmiAN+=an; f.lowN=(f.lowN||0)+1; }
       if(an>0 && t.n>=2){ const cmi=r[3]/an;
         if(cmi<t.lo-1e-9) f.lo.push(t.c); if(cmi>t.hi+1e-9) f.hi.push(t.c);
         if(cmi<0.5 && (t.mean>0.5&&t.med>0.5)) f.cond.push(t.c); }
       if(an>0 && t.vsd>0){ if(v>t.vhi2) f.vhi2.push(t.c); else if(v>t.vhi) f.vhi.push(t.c); }
     });
-    f.lowCmiVol = x.pop? f.lowCmiAN/x.pop*10000 : null;
+    f.lowCmiVol = (x.pop && f.lowCmiAN!=null)? f.lowCmiAN/x.pop*10000 : null;
     f.cond100 = f.cond.filter(c=>top100.has(c)).length;
     return f; });
   return STAT[g] = {g, mem, list, byCode:new Map(list.map(t=>[t.c,t])), top100, flags};
@@ -602,12 +649,12 @@ function vVolume(){
   if(['min','med','sd','lo','hi'].includes(S.sort)) S.sort='an';
   const volOf=(x,t)=>{ const r=PDXBY[x.i].get(t.c); return r&&r[2]>=S.mn&&x.pop? r[2]/x.pop*10000 : null; };
   const shown=sortRows(codes, G, volOf).slice(0,400);
-  const lowRows = G.flags.map(f=>({x:f.x,v:f.lowCmiVol,an:f.lowCmiAN})).sort((a,b)=>b.v-a.v);
+  const lowRows = G.flags.map(f=>({x:f.x,v:f.lowCmiVol,an:f.lowCmiAN,pct:f.lowPct})).filter(r=>r.v!=null).sort((a,b)=>b.v-a.v);
   const lmed=median(lowRows.map(r=>r.v)); const lmax=Math.max(...lowRows.map(r=>r.v))||1;
   $('#v-volume').innerHTML = meFilters('vo', `<label for="vo-only">แสดงเฉพาะ<select id="vo-only">${[['all','ทุกโรคในรายการ'],['low','โรคที่ CMI กลุ่ม < 0.5'],['hi2','มี รพ. เกิน MEAN+2SD'],['me','เฉพาะที่ รพ. ไฮไลต์เกิน MEAN+SD']].map(([v,l])=>`<option value="${v}"${S.only===v?' selected':''}>${l}</option>`).join('')}</select></label>`) + `
     <div class="grid g2" style="margin-bottom:16px">
-      <div class="panel"><h2>ผู้ป่วยในโรคที่ CMI ของ รพ. &lt; 0.5 ต่อ 10,000 ปชก.UC</h2><p class="hint">คิดราย รพ.: รวมผู้ป่วยทุกรหัส PDx ที่ CMI ของ รพ. นั้นเองต่ำกว่า 0.5 ÷ ปชก.UC × 10,000 · แสดง รพ. ในกลุ่ม ${AGL[S.ag]} · ชี้ที่แถวเพื่อดูจำนวนราย</p>
-        <div class="rlist" style="max-height:340px;overflow:auto">${lowRows.map((r,k)=>`<div class="rrow${r.x.i===S.h?' sel':''}" data-goh="${r.x.i}" title="${esc(r.x.short)}: ${fmt(r.an)} ราย ÷ ปชก.UC ${fmt(r.x.pop)} × 10,000"><span class="no">${k+1}</span><span class="nm">${esc(r.x.short)}<small>${r.x.lvl}</small></span>
+      <div class="panel"><h2>ผู้ป่วยใน AdjRW &lt; 0.5 ต่อ 10,000 ปชก.UC</h2><p class="hint">จำนวนรายจากเว็บ CMI รายงาน “ร้อยละของผู้ป่วยในจำแนกตามระดับ CMI” คอลัมน์ AdjRW &lt; 0.5 ÷ ปชก.UC × 10,000 · แสดง รพ. ในกลุ่ม ${AGL[S.ag]} · ชี้ที่แถวเพื่อดูจำนวนรายและร้อยละ</p>
+        <div class="rlist" style="max-height:340px;overflow:auto">${lowRows.map((r,k)=>`<div class="rrow${r.x.i===S.h?' sel':''}" data-goh="${r.x.i}" title="${esc(r.x.short)}: AdjRW &lt; 0.5 จำนวน ${fmt(r.an)} ราย (ร้อยละ ${fmt(r.pct,2)} ของผู้ป่วยในที่คำนวณได้) ÷ ปชก.UC ${fmt(r.x.pop)} × 10,000"><span class="no">${k+1}</span><span class="nm">${esc(r.x.short)}<small>${r.x.lvl}</small></span>
           <span class="track"><span class="fill" style="width:${(r.v/lmax*100).toFixed(2)}%"></span><span class="med" style="left:${(lmed/lmax*100).toFixed(2)}%"></span></span><span class="num">${fmt(r.v,1)}</span></div>`).join('')}</div></div>
       <div class="panel"><h2>อ่านตารางนี้อย่างไร</h2><p style="margin:0 0 8px">ตัวเลขในตาราง = ผู้ป่วยในของโรคนั้น ต่อ ปชก.UC 10,000 คน ของ รพ. ช่วยเทียบอัตรานอนโรงพยาบาลระหว่าง รพ. ที่ขนาดประชากรต่างกัน</p>
         <div class="key" style="margin:0"><span><i class="v-hi"></i>สูงกว่า MEAN+SD</span><span><i class="v-hi2"></i>สูงกว่า MEAN+2SD</span></div>
@@ -655,7 +702,7 @@ function vFlags(){
       <div class="rank-head"><div><h2>สรุปจำนวนโรคที่ติดเงื่อนไข กลุ่ม ${AGL[S.ag]}</h2><p class="hint" style="margin:0">นับรหัส PDx ต่อ รพ. ในรายการ ${S.top==='all'?'ทุกรหัส':'TOP'+S.top} ของกลุ่ม · คลิกหัวคอลัมน์เพื่อเรียง · คลิกแถวเพื่อดูรายการโรค</p></div></div>
       <div class="tbl" style="max-height:460px;overflow:auto"><table><thead><tr><th>โรงพยาบาล</th><th>ระดับ</th>
         ${Object.entries(FLAGDEF).map(([k,d])=>`<th class="num sort${S.fs===k?' on':''}" data-fs="${k}">${d.label}${S.fs===k?' ▾':''}</th>`).join('')}
-        <th class="num">ผู้ป่วยโรค CMI รพ.&lt;0.5 ต่อ 10,000</th></tr></thead><tbody>
+        <th class="num">ผู้ป่วยใน AdjRW&lt;0.5 ต่อ 10,000</th></tr></thead><tbody>
         ${rows.map(r=>`<tr class="link${r.x.i===S.h?' mine':''}" data-sel="${r.x.i}" style="${r.x.i===S.h?'background:var(--accent-soft)':''}"><td style="white-space:nowrap">${esc(r.x.short)} <span class="chip">${r.x.chw}</span></td><td><span class="lvl">${r.x.lvl}</span></td>
           ${Object.entries(FLAGDEF).map(([k,d])=>`<td class="num">${r[d.key].length? `<span class="flag ${d.cls}">${r[d.key].length}</span>`:'<span style="color:var(--muted)">0</span>'}</td>`).join('')}
           <td class="num">${fmt(r.low,1)}</td></tr>`).join('')}
@@ -697,7 +744,7 @@ function vHosp(){
       <div class="tiles" style="margin:0">
         ${[['cond','CMI < 0.5 แต่ค่ากลาง > 0.5',f.cond.length,'cond'],['lo','CMI ต่ำกว่า MEAN−SD',f.lo.length,'lo'],['hi','CMI สูงกว่า MEAN+SD',f.hi.length,'gr'],['vhi','Adj AN เกิน MEAN+SD',f.vhi.length+f.vhi2.length,'vo'],['vhi2','Adj AN เกิน MEAN+2SD',f.vhi2.length,'vo2']]
           .map(([k,l,n,c])=>`<div class="tile link" data-fl="${k}" style="cursor:pointer"><div class="k">${l}</div><div class="v"><span class="flag ${c}" style="font-size:20px;font-family:var(--mono)">${n}</span></div><div class="d">จาก ${fmt(G.list.length)} รหัสในกลุ่ม</div></div>`).join('')}
-        <div class="tile"><div class="k">ผู้ป่วยโรคที่ CMI ของ รพ. &lt; 0.5</div><div class="v">${fmt(f.lowCmiVol,1)}</div><div class="d">ต่อ 10,000 ปชก.UC · ${fmt(f.lowCmiAN)} ราย · ${fmt(f.lowN||0)} รหัส</div></div>
+        <div class="tile"><div class="k">ผู้ป่วยใน AdjRW &lt; 0.5</div><div class="v">${f.lowCmiVol==null?'—':fmt(f.lowCmiVol,1)}</div><div class="d">ต่อ 10,000 ปชก.UC · ${f.lowCmiAN==null?'ไม่มีข้อมูลจากเว็บ CMI':`${fmt(f.lowCmiAN)} ราย · ร้อยละ ${fmt(f.lowPct,2)} ของผู้ป่วยใน`}</div></div>
       </div></div>
     <div class="grid g2">
       <div class="panel"><h2>โรคหลัก (PDx) สูงสุด 15 อันดับ</h2><p class="hint">ธงเทียบกลุ่ม ${AGL[ag]} · คลิกเพื่อเทียบรหัสนี้ทุก รพ.</p><div class="tbl"><table><thead><tr><th>รหัส</th><th>ชื่อโรค</th><th class="num">ราย</th><th class="num">CMI</th><th class="num">MEAN กลุ่ม</th><th></th></tr></thead><tbody>
@@ -864,6 +911,7 @@ function go(tab){ if(['matrix','volume','flags'].includes(tab) && !['matrix','vo
   S.tab=tab; lastTab=tab; render(); window.scrollTo({top:0}); }
 document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>go(b.dataset.tab));
 $('#fy').textContent=D.meta.fy; $('#run').textContent=new Date(D.meta.run).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric'});
+$('#creditUpdated').textContent=new Date(D.meta.run).toLocaleDateString('th-TH',{day:'numeric',month:'long',year:'numeric'});
 $('#foot').innerHTML = `ข้อมูลผู้ป่วยในจาก CMI@MoPH (PDx 3 หลัก, DRG) ปีงบ ${D.meta.fy} เขตสุขภาพที่ ${D.meta.region} ดึงเมื่อ ${D.meta.run} · PDx และ DRG เป็นยอดสะสมตั้งแต่ต้นปีงบ · ${D.meta.master} · ไม่มีข้อมูล: ${D.meta.failed.join(', ')} (เซิร์ฟเวอร์ต้นทางตอบ HTTP 500)`;
 const mq=matchMedia('(prefers-color-scheme: dark)'); mq.addEventListener?.('change',render);
 new MutationObserver(render).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});

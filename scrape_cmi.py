@@ -108,6 +108,34 @@ def parse_code_table(txt, pattern):
     return out
 
 
+RW05_CELL = re.compile(r"^([\d,]+)\(([\d.]+)\)$")
+
+
+def parse_ipd_percentage(txt):
+    """คืน {hcode: [จำนวนผู้ป่วยใน AdjRW<0.5, ร้อยละ]}
+
+    จากรายงาน 'ร้อยละของผู้ป่วยในจำแนกตามระดับ CMI' (endpoint ipd_percentage)
+    คอลัมน์: ชื่อ รพ. | จำนวนส่ง | จำนวนคำนวณ | TotalAdjRW | AdjRW<0.5 จำนวน(ร้อยละ) | ...
+    """
+    out = {}
+    try:
+        doc = LH.fromstring(txt)
+    except Exception:  # noqa: BLE001
+        return out
+    for tr in doc.xpath("//tr"):
+        cells = [" ".join(td.text_content().split()) for td in tr.xpath("./td|./th")]
+        if len(cells) < 5:
+            continue
+        m = re.match(r"^(\d{5})\s*:", cells[0])          # '11176: รพ.ท่าวังผา'
+        if not m:
+            continue                                      # ข้ามหัวตารางและแถวรวมจังหวัด
+        g = RW05_CELL.match(cells[4].replace(" ", ""))    # '1,027(34.94)'
+        if not g:
+            continue
+        out[m.group(1)] = [int(g.group(1).replace(",", "")), float(g.group(2))]
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--year", type=int, help="ปีงบประมาณ (พ.ศ. หรือ ค.ศ.)")
@@ -139,6 +167,22 @@ def main():
 
     H, PDXC, PDX, DRGC, DRG, failed = [], [], [], [], [], []
     pidx, didx = {}, {}
+
+    # ผู้ป่วยใน AdjRW < 0.5 — ดึงทีละจังหวัด (hcode ว่าง = ทุก รพ. ในจังหวัด) จึงใช้แค่ 8 คำขอ
+    RW05 = {}
+    for chwcode in sorted({h["chwcode"] for h in hospitals}):
+        try:
+            txt = cmi.post("ipd_percentage", {
+                "year": fy_ce, "region": region, "chwcode": chwcode,
+                "hcode": "", "hosptype": "", "servplan": "", "rdorpt": "1",
+            })
+            RW05.update(parse_ipd_percentage(txt))
+        except Exception as e:  # noqa: BLE001
+            failed.append(f"ipd_percentage จังหวัด {chwcode}: {e}")
+        time.sleep(DELAY)
+    print(f"AdjRW < 0.5 ได้ {len(RW05)} แห่ง", flush=True)
+
+
     for n, h in enumerate(hospitals, start=1):
         m = master.get(h["hcode"], {})
         hi = len(H)
@@ -176,6 +220,8 @@ def main():
             "master": "HOSNAME จากไฟล์ M and E เขตสุขภาพที่ 1 (ปชก.UC 1 เม.ย. 68, เตียงจริง กบรส.)",
         },
         "H": H, "PDXC": PDXC, "PDX": PDX, "DRGC": DRGC, "DRG": DRG, "M505": {}, "G505": [],
+        # LOW[i] = [จำนวนผู้ป่วยใน AdjRW<0.5, ร้อยละ] ของ H[i] · null = เว็บไม่มีข้อมูล
+        "LOW": [RW05.get(r[0]) for r in H],
     }
     hosp_with_data = len({r[0] for r in DRG})
     if hosp_with_data < 0.8 * len(H):
@@ -184,7 +230,8 @@ def main():
     with open(args.out, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
     print(f"เขียน {args.out} · {len(H)} รพ. · มีข้อมูล {hosp_with_data} แห่ง · "
-          f"PDx {len(PDX):,} แถว · DRG {len(DRG):,} แถว · พลาด {len(failed)} คำขอ", flush=True)
+          f"PDx {len(PDX):,} แถว · DRG {len(DRG):,} แถว · AdjRW<0.5 {len(RW05)} แห่ง · "
+          f"พลาด {len(failed)} คำขอ", flush=True)
     for x in failed[:10]:
         print("  พลาด:", x)
 
