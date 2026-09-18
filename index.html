@@ -328,7 +328,7 @@ footer.credit{margin:28px 0 8px;padding:0;border:1px solid var(--line);border-to
       <dt>สีต่ำ / สีสูง</dt><dd>CMI ของ รพ. &lt; MEAN−SD หรือ &gt; MEAN+SD</dd>
       <dt>CMI &lt; 0.5 แต่ค่ากลาง &gt; 0.5</dt><dd>CMI ของ รพ. ต่ำกว่า 0.5 ขณะที่ทั้ง MEAN และ MEDIAN ของกลุ่มสูงกว่า 0.5 (เงื่อนไขทบทวนการสรุปเวชระเบียน)</dd>
       <dt>Adj AN ต่อ 10,000 ปชก.UC</dt><dd>จำนวนผู้ป่วยโรคนั้น ÷ ปชก.UC (1 เม.ย. 68) × 10,000 · MEAN/SD คิดจากทุก รพ. ในกลุ่ม รวมค่า 0 · สีเข้ม &gt; MEAN+2SD</dd>
-      <dt>ผู้ป่วยใน AdjRW &lt; 0.5 ต่อ 10,000 ปชก.UC</dt><dd>จำนวนผู้ป่วยในที่ AdjRW ของราย (admission) นั้นต่ำกว่า 0.5 หารด้วย ปชก.UC ของ รพ. × 10,000 · จำนวนรายดึงตรงจากเว็บ CMI รายงาน “ร้อยละของผู้ป่วยในจำแนกตามระดับ CMI” คอลัมน์ AdjRW &lt; 0.5 ตัวเลขจึงตรงกับเว็บต้นทางทุกแห่ง (เดิมคิดจากการรวมรหัส PDx ที่ CMI ของ รพ. ต่ำกว่า 0.5 ซึ่งเป็นคนละฐาน)</dd>
+      <dt>ร้อยละผู้ป่วยในที่ AdjRW &lt; 0.5</dt><dd>จำนวนผู้ป่วยในที่ AdjRW ของราย (admission) นั้นต่ำกว่า 0.5 หารด้วยจำนวนผู้ป่วยในทั้งหมดของ รพ. × 100 · ดึงตรงจากเว็บ CMI รายงาน “ร้อยละของผู้ป่วยในจำแนกตามระดับ CMI” คอลัมน์ AdjRW &lt; 0.5 ช่องจำนวน (ร้อยละ) ตัวเลขจึงตรงกับเว็บต้นทางทุกแห่ง · ไม่เกี่ยวกับ ปชก.UC เพราะเทียบภายใน รพ. เดียวกันอยู่แล้ว</dd>
       <dt>TOP100</dt><dd>100 รหัสโรคที่มีผู้ป่วยรวมสูงสุดในกลุ่มที่เลือก</dd>
     </dl>
   </details>
@@ -356,7 +356,7 @@ footer.credit{margin:28px 0 8px;padding:0;border:1px solid var(--line);border-to
     <div class="credit__foot">
       <span>แหล่งข้อมูล: cmi.moph.go.th · ปชก.UC และเตียง จาก M&amp;E เขตสุขภาพที่ 1</span>
       <span>ปรับปรุงข้อมูลล่าสุด <b id="creditUpdated">—</b></span>
-      <span><a href="https://github.com/cmi-rh1/cmi-rh1" target="_blank" rel="noopener">ซอร์สโค้ดและวิธีคำนวณ</a></span>
+      <span><a href="#defs" id="creditDefs">นิยามและวิธีคำนวณ</a></span>
     </div>
   </footer>
 </main>
@@ -429,7 +429,7 @@ function groupStats(g){
         if(cmi<0.5 && (t.mean>0.5&&t.med>0.5)) f.cond.push(t.c); }
       if(an>0 && t.vsd>0){ if(v>t.vhi2) f.vhi2.push(t.c); else if(v>t.vhi) f.vhi.push(t.c); }
     });
-    f.lowCmiVol = (x.pop && f.lowCmiAN!=null)? f.lowCmiAN/x.pop*10000 : null;
+    f.lowCmiVol = f.lowPct;   // ร้อยละผู้ป่วยใน AdjRW < 0.5 ตามเว็บ CMI
     f.cond100 = f.cond.filter(c=>top100.has(c)).length;
     return f; });
   return STAT[g] = {g, mem, list, byCode:new Map(list.map(t=>[t.c,t])), top100, flags};
@@ -653,9 +653,9 @@ function vVolume(){
   const lmed=median(lowRows.map(r=>r.v)); const lmax=Math.max(...lowRows.map(r=>r.v))||1;
   $('#v-volume').innerHTML = meFilters('vo', `<label for="vo-only">แสดงเฉพาะ<select id="vo-only">${[['all','ทุกโรคในรายการ'],['low','โรคที่ CMI กลุ่ม < 0.5'],['hi2','มี รพ. เกิน MEAN+2SD'],['me','เฉพาะที่ รพ. ไฮไลต์เกิน MEAN+SD']].map(([v,l])=>`<option value="${v}"${S.only===v?' selected':''}>${l}</option>`).join('')}</select></label>`) + `
     <div class="grid g2" style="margin-bottom:16px">
-      <div class="panel"><h2>ผู้ป่วยใน AdjRW &lt; 0.5 ต่อ 10,000 ปชก.UC</h2><p class="hint">จำนวนรายจากเว็บ CMI รายงาน “ร้อยละของผู้ป่วยในจำแนกตามระดับ CMI” คอลัมน์ AdjRW &lt; 0.5 ÷ ปชก.UC × 10,000 · แสดง รพ. ในกลุ่ม ${AGL[S.ag]} · ชี้ที่แถวเพื่อดูจำนวนรายและร้อยละ</p>
-        <div class="rlist" style="max-height:340px;overflow:auto">${lowRows.map((r,k)=>`<div class="rrow${r.x.i===S.h?' sel':''}" data-goh="${r.x.i}" title="${esc(r.x.short)}: AdjRW &lt; 0.5 จำนวน ${fmt(r.an)} ราย (ร้อยละ ${fmt(r.pct,2)} ของผู้ป่วยในที่คำนวณได้) ÷ ปชก.UC ${fmt(r.x.pop)} × 10,000"><span class="no">${k+1}</span><span class="nm">${esc(r.x.short)}<small>${r.x.lvl}</small></span>
-          <span class="track"><span class="fill" style="width:${(r.v/lmax*100).toFixed(2)}%"></span><span class="med" style="left:${(lmed/lmax*100).toFixed(2)}%"></span></span><span class="num">${fmt(r.v,1)}</span></div>`).join('')}</div></div>
+      <div class="panel"><h2>ร้อยละผู้ป่วยในที่ AdjRW &lt; 0.5</h2><p class="hint">ผู้ป่วยในที่ AdjRW &lt; 0.5 ÷ ผู้ป่วยในทั้งหมดของ รพ. × 100 · ค่าเดียวกับเว็บ CMI รายงาน “ร้อยละของผู้ป่วยในจำแนกตามระดับ CMI” คอลัมน์ AdjRW &lt; 0.5 · แสดง รพ. ในกลุ่ม ${AGL[S.ag]} · ชี้ที่แถวเพื่อดูจำนวนราย</p>
+        <div class="rlist" style="max-height:340px;overflow:auto">${lowRows.map((r,k)=>`<div class="rrow${r.x.i===S.h?' sel':''}" data-goh="${r.x.i}" title="${esc(r.x.short)}: ผู้ป่วยใน AdjRW &lt; 0.5 จำนวน ${fmt(r.an)} ราย คิดเป็นร้อยละ ${fmt(r.v,2)} ของผู้ป่วยในทั้งหมด"><span class="no">${k+1}</span><span class="nm">${esc(r.x.short)}<small>${r.x.lvl}</small></span>
+          <span class="track"><span class="fill" style="width:${(r.v/lmax*100).toFixed(2)}%"></span><span class="med" style="left:${(lmed/lmax*100).toFixed(2)}%"></span></span><span class="num">${fmt(r.v,2)}</span></div>`).join('')}</div></div>
       <div class="panel"><h2>อ่านตารางนี้อย่างไร</h2><p style="margin:0 0 8px">ตัวเลขในตาราง = ผู้ป่วยในของโรคนั้น ต่อ ปชก.UC 10,000 คน ของ รพ. ช่วยเทียบอัตรานอนโรงพยาบาลระหว่าง รพ. ที่ขนาดประชากรต่างกัน</p>
         <div class="key" style="margin:0"><span><i class="v-hi"></i>สูงกว่า MEAN+SD</span><span><i class="v-hi2"></i>สูงกว่า MEAN+2SD</span></div>
         <p class="hint" style="margin-top:8px">MEAN และ SD คิดจากทุก รพ. ในกลุ่ม รวม รพ. ที่ไม่มีผู้ป่วยโรคนั้น (ค่า 0) · เส้นประในกราฟซ้าย = มัธยฐาน</p></div>
@@ -702,10 +702,10 @@ function vFlags(){
       <div class="rank-head"><div><h2>สรุปจำนวนโรคที่ติดเงื่อนไข กลุ่ม ${AGL[S.ag]}</h2><p class="hint" style="margin:0">นับรหัส PDx ต่อ รพ. ในรายการ ${S.top==='all'?'ทุกรหัส':'TOP'+S.top} ของกลุ่ม · คลิกหัวคอลัมน์เพื่อเรียง · คลิกแถวเพื่อดูรายการโรค</p></div></div>
       <div class="tbl" style="max-height:460px;overflow:auto"><table><thead><tr><th>โรงพยาบาล</th><th>ระดับ</th>
         ${Object.entries(FLAGDEF).map(([k,d])=>`<th class="num sort${S.fs===k?' on':''}" data-fs="${k}">${d.label}${S.fs===k?' ▾':''}</th>`).join('')}
-        <th class="num">ผู้ป่วยใน AdjRW&lt;0.5 ต่อ 10,000</th></tr></thead><tbody>
+        <th class="num">ร้อยละ AdjRW&lt;0.5</th></tr></thead><tbody>
         ${rows.map(r=>`<tr class="link${r.x.i===S.h?' mine':''}" data-sel="${r.x.i}" style="${r.x.i===S.h?'background:var(--accent-soft)':''}"><td style="white-space:nowrap">${esc(r.x.short)} <span class="chip">${r.x.chw}</span></td><td><span class="lvl">${r.x.lvl}</span></td>
           ${Object.entries(FLAGDEF).map(([k,d])=>`<td class="num">${r[d.key].length? `<span class="flag ${d.cls}">${r[d.key].length}</span>`:'<span style="color:var(--muted)">0</span>'}</td>`).join('')}
-          <td class="num">${fmt(r.low,1)}</td></tr>`).join('')}
+          <td class="num">${fmt(r.low,2)}</td></tr>`).join('')}
       </tbody></table></div></div>
     <div class="panel">
       <div class="rank-head"><div><h2>${esc(me.x.name)} <span class="lvl">${me.x.lvl}</span></h2><p class="hint" style="margin:0">เทียบกับกลุ่ม ${AGL[S.ag]} · <a href="#" id="fl-goh" style="color:var(--accent)">ดูหน้ารายโรงพยาบาล</a></p></div></div>
@@ -744,7 +744,7 @@ function vHosp(){
       <div class="tiles" style="margin:0">
         ${[['cond','CMI < 0.5 แต่ค่ากลาง > 0.5',f.cond.length,'cond'],['lo','CMI ต่ำกว่า MEAN−SD',f.lo.length,'lo'],['hi','CMI สูงกว่า MEAN+SD',f.hi.length,'gr'],['vhi','Adj AN เกิน MEAN+SD',f.vhi.length+f.vhi2.length,'vo'],['vhi2','Adj AN เกิน MEAN+2SD',f.vhi2.length,'vo2']]
           .map(([k,l,n,c])=>`<div class="tile link" data-fl="${k}" style="cursor:pointer"><div class="k">${l}</div><div class="v"><span class="flag ${c}" style="font-size:20px;font-family:var(--mono)">${n}</span></div><div class="d">จาก ${fmt(G.list.length)} รหัสในกลุ่ม</div></div>`).join('')}
-        <div class="tile"><div class="k">ผู้ป่วยใน AdjRW &lt; 0.5</div><div class="v">${f.lowCmiVol==null?'—':fmt(f.lowCmiVol,1)}</div><div class="d">ต่อ 10,000 ปชก.UC · ${f.lowCmiAN==null?'ไม่มีข้อมูลจากเว็บ CMI':`${fmt(f.lowCmiAN)} ราย · ร้อยละ ${fmt(f.lowPct,2)} ของผู้ป่วยใน`}</div></div>
+        <div class="tile"><div class="k">ร้อยละผู้ป่วยในที่ AdjRW &lt; 0.5</div><div class="v">${f.lowCmiVol==null?'—':fmt(f.lowCmiVol,2)}</div><div class="d">${f.lowCmiAN==null?'ไม่มีข้อมูลจากเว็บ CMI':`${fmt(f.lowCmiAN)} ราย จากผู้ป่วยในทั้งหมดของ รพ.`}</div></div>
       </div></div>
     <div class="grid g2">
       <div class="panel"><h2>โรคหลัก (PDx) สูงสุด 15 อันดับ</h2><p class="hint">ธงเทียบกลุ่ม ${AGL[ag]} · คลิกเพื่อเทียบรหัสนี้ทุก รพ.</p><div class="tbl"><table><thead><tr><th>รหัส</th><th>ชื่อโรค</th><th class="num">ราย</th><th class="num">CMI</th><th class="num">MEAN กลุ่ม</th><th></th></tr></thead><tbody>
@@ -912,6 +912,7 @@ function go(tab){ if(['matrix','volume','flags'].includes(tab) && !['matrix','vo
 document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>go(b.dataset.tab));
 $('#fy').textContent=D.meta.fy; $('#run').textContent=new Date(D.meta.run).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric'});
 $('#creditUpdated').textContent=new Date(D.meta.run).toLocaleDateString('th-TH',{day:'numeric',month:'long',year:'numeric'});
+$('#creditDefs').onclick=e=>{ e.preventDefault(); const d=$('#defs'); d.open=true; d.scrollIntoView({behavior:'smooth',block:'center'}); };
 $('#foot').innerHTML = `ข้อมูลผู้ป่วยในจาก CMI@MoPH (PDx 3 หลัก, DRG) ปีงบ ${D.meta.fy} เขตสุขภาพที่ ${D.meta.region} ดึงเมื่อ ${D.meta.run} · PDx และ DRG เป็นยอดสะสมตั้งแต่ต้นปีงบ · ${D.meta.master} · ไม่มีข้อมูล: ${D.meta.failed.join(', ')} (เซิร์ฟเวอร์ต้นทางตอบ HTTP 500)`;
 const mq=matchMedia('(prefers-color-scheme: dark)'); mq.addEventListener?.('change',render);
 new MutationObserver(render).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
